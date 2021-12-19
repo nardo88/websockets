@@ -1,6 +1,5 @@
-import ws , { WebSocketServer } from 'ws'
-// создаем webSocket server
-
+import { WebSocketServer } from 'ws'
+// СОЗДАНИЕ WEBSOCKET SERVER
 // создаем экземпляр webSocket сервера
 // В конструктор передаем объект с конфигурацией
 // и callBack который будет запущен при старте сервера
@@ -27,12 +26,14 @@ webSocketSrv.on('connection', function connection(ws) {
         }
     })
 })
+
 // реализуем функцию которая будет отправлять сообщение всем подключенным
 const broadCastMessage = (message) => {
-    // обращаемся к нашему webSocket серверу и обращаемся ко всем подключившимся клиентам
+    // обращаемся к нашему webSocket серверу у которого усть
+    // свойство clients - массив со всеми пользователями
     webSocketSrv.clients.forEach(client => {
         // каждый клиент так же является websocket-ом
-        // Поэтому нам доступен метод send
+        // Поэтому нам доступен метод send (метод отправки response клиенту)
         client.send(JSON.stringify(message))
 
     })
