@@ -1,6 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react'
-import axios from 'axios'
+import React, { useState, useRef } from 'react'
 import './App.css';
 
 function App() {
@@ -18,7 +17,7 @@ function App() {
 
   // функция отправки сообщения
   const sendMessage = async () => {
-    // отправляем POST запрос к нашему API и отправляем объект сообщения
+    // Собираем объект сообщения
     const message = {
       event: 'message',
       userName,
@@ -32,10 +31,14 @@ function App() {
   }
 
   function connect (){
+    // В ref ссылку помещаем объект с помощью которого будем работать с Websocket
     // в качестве аргумента передаем сыдрес до websocket-a 
-    // здесь обращаем внимание на то, что
+    // здесь обращаем внимание на то, что мы используем не http протокол а ws
     socket.current = new WebSocket('ws://localhost:5000') 
-    // теперь на этот websocket мы можем повесить слушатели
+    // теперь на этот websocket мы можем повесить слушатели событий
+    // подключения, получения сообщения, закрытия подключения и
+    // возникновения ошибки
+
     // событие onopen сработает в момент подключения
     socket.current.onopen = () => {
       // после того как подключение установлено мы меняем state
@@ -49,18 +52,20 @@ function App() {
       // отправляем сообщение на сервер
       socket.current.send(JSON.stringify(message))
     }
-    // событие onmessage сработает при получении сообщения
+    // следующее событие onmessage сработает при получении сообщения
     socket.current.onmessage = (event) => {
       // получаем сообщение
       const message = JSON.parse(event.data)
       // это сообщение отправляем в state
       setMessages(prev => [message, ...prev])
     }
+
     // событие onclose сработает при отключении
     socket.current.onclose = () => {
       console.log('соединение закрытось');
       setConnected(false)
     }
+
     // событие onerror сработает при ошибке
     socket.current.onerror = () => {
       console.log('Socket произошла ошибка!');
@@ -74,7 +79,12 @@ function App() {
         connected ? (
           <div className="container">
           <div className="control">
-            <input type="text" className="message" value={input} onChange={e => setInput(e.target.value)} />
+            <input 
+              type="text" 
+              className="message" 
+              value={input} 
+              onChange={e => setInput(e.target.value)} 
+            />
             <button className="send" onClick={sendMessage}>send</button>
           </div>
           <div className="chat">
@@ -92,7 +102,12 @@ function App() {
         ) : (
           <div className="container">
           <div className="control">
-            <input type="text" className="message" value={userName} onChange={e => setUserName(e.target.value)} />
+            <input 
+              type="text" 
+              className="message" 
+              value={userName} 
+              onChange={e => setUserName(e.target.value)} 
+            />
             <button className="send" onClick={connect}>Войти</button>
           </div>
         </div>
